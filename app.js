@@ -69,6 +69,7 @@ const I = {
 
 const esc = (s) => { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML }
 
+
 // ---------- shared chrome ----------
 function navbar() {
   const links = [['#/how-it-works', 'How it works'], ['#/pricing', 'Pricing'], ['#/faq', 'FAQ']]

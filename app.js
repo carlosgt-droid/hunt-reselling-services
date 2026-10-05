@@ -210,9 +210,9 @@ function footer() {
       <div>
         <h4>Trust</h4>
         <ul>
-          <li><span>No-find, no-fee guarantee</span></li>
-          <li><span>Secure payments</span></li>
-          <li><span>Buyer protection</span></li>
+          <li><a href="#/how-it-works">No-find, no-fee guarantee</a></li>
+          <li><a href="#/faq">Secure payments</a></li>
+          <li><a href="#/faq">Buyer protection</a></li>
         </ul>
       </div>
     </div>

@@ -210,9 +210,9 @@ function footer() {
       <div>
         <h4>Trust</h4>
         <ul>
-          <li><a href="#/how-it-works">No-find, no-fee guarantee</a></li>
-          <li><a href="#/faq">Secure payments</a></li>
-          <li><a href="#/faq">Buyer protection</a></li>
+          <li><a href="#/guarantee">No-find, no-fee guarantee</a></li>
+          <li><a href="#/secure-payments">Secure payments</a></li>
+          <li><a href="#/buyer-protection">Buyer protection</a></li>
         </ul>
       </div>
     </div>
@@ -853,6 +853,132 @@ function pageNotFound() {
   return `<div class="container-x nf"><p class="big">404</p><h1>Page not found</h1><p>The page you're hunting for isn't here.</p><a href="#/" class="btn btn-primary mt-6">Back to home</a></div>`
 }
 
+// ---------- trust / info pages ----------
+// Shared renderer for a focused single-topic page.
+function infoPage({ eyebrow, title, subtitle, points, how, faqs: pageFaqs, ctaTitle }) {
+  return `
+  <div class="container-x section" style="padding-top:4rem">
+    ${sectionHead({ eyebrow, title, subtitle })}
+
+    <div class="grid info-points">
+      ${points.map((p) => `
+        <div class="card info-point">
+          <div class="icon-box grad sm">${I[p.icon]({ s: 20 })}</div>
+          <h3>${p.title}</h3>
+          <p class="desc">${p.desc}</p>
+        </div>`).join('')}
+    </div>
+
+    ${how ? `
+    <div class="callout" style="margin-top:3rem">
+      <h3>${I.check({ s: 20, c: 'text-brand' })} ${how.title}</h3>
+      <ul>${how.items.map((t) => `<li>${I.check({ s: 18, c: 'text-brand' })} ${t}</li>`).join('')}</ul>
+    </div>` : ''}
+
+    ${pageFaqs ? `
+    <div class="info-faqs">
+      <h2 class="dash-section-title" style="text-align:center;margin-bottom:1.25rem">Good to know</h2>
+      ${pageFaqs.map((f) => `
+        <div class="info-qa card">
+          <p class="iq">${f.q}</p>
+          <p class="ia">${f.a}</p>
+        </div>`).join('')}
+    </div>` : ''}
+
+    <div class="cta" style="margin-top:3.5rem">
+      <div class="blob a"></div><div class="blob b"></div>
+      <h2>${ctaTitle || "Ready when you are."}</h2>
+      <p>Start a request in under two minutes — you won't be charged unless we land it.</p>
+      <div style="position:relative;margin-top:2rem;display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap">
+        <a href="#/request" class="btn btn-primary btn-lg">Start a request ${I.arrow({ s: 18 })}</a>
+        <a href="#/faq" class="btn btn-ghost btn-lg">See all FAQs</a>
+      </div>
+    </div>
+  </div>`
+}
+
+function pageGuarantee() {
+  return infoPage({
+    eyebrow: 'Our promise',
+    title: 'The no-find, no-fee guarantee',
+    subtitle: "It's simple: your card is never charged unless we actually get the item into our hands. No luck, no risk, no catch.",
+    points: [
+      { icon: 'shield', title: 'Charged only on success', desc: 'The moment we secure your item is the only moment your payment method is ever charged — item price plus the agreed service fee.' },
+      { icon: 'card', title: 'No find = no charge', desc: "If we can't track it down, you pay nothing. There's no cancellation fee and no charge for the attempt. Ever." },
+      { icon: 'tag', title: 'You set a hard price cap', desc: 'We will never buy above the maximum price you set. The service fee ($0–$100) is shown and approved before the hunt begins.' },
+    ],
+    how: {
+      title: 'The guarantee in plain terms',
+      items: [
+        'You are never charged until the item is physically secured.',
+        'If we never find it, there is no charge and no cancellation fee.',
+        'You set a hard price cap — we never buy above it.',
+        'The service fee ($0–$100) is shown and approved before the hunt begins.',
+        'Cancel a pending hunt anytime, at no cost.',
+      ],
+    },
+    faqs: [
+      { q: 'When exactly am I charged?', a: "Only after we successfully secure your item — the item's price plus a one-time service fee between $0 and $100. If we never find it, you're never charged a cent." },
+      { q: 'What if I change my mind mid-hunt?', a: 'You can cancel any pending hunt before we secure the item, completely free. Since nothing has been charged, there is nothing to refund.' },
+    ],
+    ctaTitle: 'Zero risk. Start a hunt.',
+  })
+}
+
+function pageSecurePayments() {
+  return infoPage({
+    eyebrow: 'Payments',
+    title: 'Secure payments, by design',
+    subtitle: 'Your payment details are protected with bank-grade encryption, and your card is only ever charged for a successful find.',
+    points: [
+      { icon: 'lock', title: 'Encrypted & tokenized', desc: 'Card details are encrypted and tokenized by our payment provider. We never see or store your raw card number.' },
+      { icon: 'shield', title: 'No charge up front', desc: 'Saving a card places a $0.00 hold — not a payment. You are only charged if and when we land your item.' },
+      { icon: 'tag', title: 'Transparent totals', desc: 'You approve the item price and the service fee before any charge. No surprise markups, no hidden costs.' },
+    ],
+    how: {
+      title: 'How we keep payments safe',
+      items: [
+        'Card data is handled by a PCI-compliant payment processor, not stored on our servers.',
+        'Every charge maps to a specific secured item you requested.',
+        'A hard price cap means we can never charge above what you approved.',
+        'Clear receipts show the item price and the service fee separately.',
+      ],
+    },
+    faqs: [
+      { q: 'Do you store my card number?', a: 'No. Your card is tokenized by our payment provider. We keep only a secure reference, never the raw number.' },
+      { q: 'Will I be charged when I sign up a card?', a: 'No. Adding a card is a $0.00 authorization, not a charge. Money only moves when we successfully secure an item for you.' },
+    ],
+    ctaTitle: 'Pay only when we win.',
+  })
+}
+
+function pageBuyerProtection() {
+  return infoPage({
+    eyebrow: 'Buyer protection',
+    title: 'Covered from hunt to doorstep',
+    subtitle: "If something isn't right with an item we secured for you, we make it right — a replacement or a full refund of the item and the service fee.",
+    points: [
+      { icon: 'package', title: 'Arrives as described', desc: 'We verify authenticity and condition before anything ships. If an item arrives not as described, you are covered.' },
+      { icon: 'shield', title: 'Replace or refund', desc: 'For a covered issue, we work to source a replacement or fully refund the item cost and the service fee.' },
+      { icon: 'users', title: 'Real humans to help', desc: 'A sourcing team stands behind every order to resolve problems quickly, without the runaround.' },
+    ],
+    how: {
+      title: "What buyer protection covers",
+      items: [
+        'Items that arrive damaged or not as described.',
+        'Wrong size, color, edition, or model versus what you requested.',
+        'Authenticity concerns on verified-seller purchases.',
+        'A full refund of the item cost and service fee when we can\'t make it right.',
+      ],
+    },
+    faqs: [
+      { q: 'What if my item arrives damaged?', a: 'Contact us and we\'ll work to replace it or fully refund the item cost and the service fee. We verify condition before shipping to minimize this.' },
+      { q: 'How long do I have to report an issue?', a: 'Reach out as soon as your item arrives. The sooner we know, the faster we can source a replacement or process a refund.' },
+    ],
+    ctaTitle: 'Shop hard-to-get items with confidence.',
+  })
+}
+
 // ---------- router ----------
 function currentRoute() {
   const h = location.hash.replace(/^#/, '').split('?')[0]
@@ -868,6 +994,9 @@ const routes = {
   '/login': pageLogin,
   '/dashboard': pageDashboard,
   '/track': pageTrack,
+  '/guarantee': pageGuarantee,
+  '/secure-payments': pageSecurePayments,
+  '/buyer-protection': pageBuyerProtection,
 }
 
 function render() {

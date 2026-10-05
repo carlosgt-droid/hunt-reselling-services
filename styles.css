@@ -560,3 +560,33 @@ textarea.input { min-height: 90px; resize: vertical; }
 .info-qa { padding: 1.25rem 1.5rem; }
 .info-qa .iq { font-weight: 600; color: #fff; }
 .info-qa .ia { margin-top: .5rem; font-size: .875rem; line-height: 1.6; color: #94a3b8; }
+
+/* ---------- footer legal row ---------- */
+.footer-legal { display: flex; gap: 1.25rem; }
+.footer-legal a { color: #64748b; }
+.footer-legal a:hover { color: #cbd5e1; }
+
+/* ---------- about ---------- */
+.about-story { max-width: 48rem; margin: 2.5rem auto 0; display: flex; flex-direction: column; gap: 1rem; }
+.about-story p { font-size: .95rem; line-height: 1.7; color: #cbd5e1; }
+
+/* ---------- contact ---------- */
+.contact-grid { display: grid; gap: 1.5rem; margin-top: 3rem; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .contact-grid { grid-template-columns: 1.6fr 1fr; align-items: start; } }
+.contact-form-card { padding: 1.75rem; }
+.contact-side { display: flex; flex-direction: column; gap: 1rem; }
+.contact-method { display: flex; align-items: flex-start; gap: 1rem; padding: 1.25rem; transition: border-color .15s, background .15s; }
+a.contact-method:hover { border-color: rgba(67,189,132,.3); background: rgba(26,26,36,.6); }
+.cm-title { font-weight: 600; color: #fff; }
+.cm-value { margin-top: .125rem; font-size: .875rem; color: #e2e8f0; }
+.cm-note { margin-top: .125rem; font-size: .75rem; color: #64748b; }
+
+/* ---------- legal (terms / privacy) ---------- */
+.legal { max-width: 44rem; margin: 0 auto; }
+.legal-title { font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+.legal-updated { margin-top: .5rem; font-size: .8125rem; color: #64748b; }
+.legal-intro { margin-top: 1.25rem; font-size: .95rem; line-height: 1.7; color: #cbd5e1; }
+.legal-section { margin-top: 2rem; }
+.legal-section h2 { font-size: 1.125rem; font-weight: 700; color: #fff; }
+.legal-section p { margin-top: .5rem; font-size: .9rem; line-height: 1.7; color: #94a3b8; }
+.legal-disclaimer { margin-top: 2.5rem; display: flex; gap: .625rem; align-items: flex-start; border-radius: .75rem; border: 1px solid rgba(251,191,36,.25); background: rgba(251,191,36,.08); padding: 1rem 1.25rem; font-size: .8125rem; line-height: 1.6; color: #fcd34d; }

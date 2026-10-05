@@ -141,6 +141,10 @@ const I = {
   star: (p={}) => `<svg width="${p.s||16}" height="${p.s||16}" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.5 5.9 6.4.5-4.9 4.2 1.5 6.3L12 16.8 6 20.9l1.5-6.3L2.6 10.4l6.4-.5L12 3Z"/></svg>`,
   grid: (p={}) => `${I._s(p)}<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>`,
   truck: (p={}) => `${I._s(p)}<path d="M3 6.5h11v9H3z"/><path d="M14 9.5h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17.5" cy="18" r="1.8"/></svg>`,
+  mail: (p={}) => `${I._s(p)}<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></svg>`,
+  chat: (p={}) => `${I._s(p)}<path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>`,
+  doc: (p={}) => `${I._s(p)}<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 16h6"/></svg>`,
+  globe: (p={}) => `${I._s(p)}<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18"/></svg>`,
 }
 
 const esc = (s) => { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML }
@@ -215,11 +219,24 @@ function footer() {
           <li><a href="#/buyer-protection">Buyer protection</a></li>
         </ul>
       </div>
+      <div>
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#/about">About</a></li>
+          <li><a href="#/contact">Contact</a></li>
+          <li><a href="#/terms">Terms of Service</a></li>
+          <li><a href="#/privacy">Privacy Policy</a></li>
+        </ul>
+      </div>
     </div>
     <div class="footer-bottom">
       <div class="container-x inner">
         <p>© ${year} Hunt. All rights reserved.</p>
-        <p>We only charge for successful finds. Service fee ranges from $0–$100 per item.</p>
+        <div class="footer-legal">
+          <a href="#/terms">Terms</a>
+          <a href="#/privacy">Privacy</a>
+          <a href="#/contact">Contact</a>
+        </div>
       </div>
     </div>
   </footer>`
@@ -853,6 +870,179 @@ function pageNotFound() {
   return `<div class="container-x nf"><p class="big">404</p><h1>Page not found</h1><p>The page you're hunting for isn't here.</p><a href="#/" class="btn btn-primary mt-6">Back to home</a></div>`
 }
 
+// ---------- about ----------
+function pageAbout() {
+  const values = [
+    { icon: 'shield', title: 'Fair, not predatory', desc: 'We buy at or near retail and charge a small, transparent service fee — the opposite of scalping. The goal is to get real people the real item.' },
+    { icon: 'bolt', title: 'Fast where it counts', desc: 'Monitoring and sourcing that react in seconds, because the difference between getting an item and missing it is often measured in moments.' },
+    { icon: 'users', title: 'Humans behind the tech', desc: 'Automation finds the openings; a real sourcing team verifies authenticity and condition before anything ships to you.' },
+  ]
+  const stats2 = [
+    { value: '38k+', label: 'Items secured' },
+    { value: '94%', label: 'Hunt success rate' },
+    { value: '$0', label: 'Charged if not found' },
+  ]
+  return `
+  <div class="container-x section" style="padding-top:4rem">
+    ${sectionHead({ eyebrow: 'About Hunt', title: 'We get people the items they can\'t buy', subtitle: 'Stock shortages and scalper bots turned buying popular things into a lottery. We built Hunt to fix that — a sourcing service that only wins when you do.' })}
+
+    <div class="about-story card">
+      <p>Hunt started from a simple frustration: wanting something that was technically on sale somewhere, at a fair price, but impossible to actually get. Sold out in seconds. Snapped up by bots. Flipped at double the price.</p>
+      <p>So we flipped the model. Instead of racing the scalpers yourself, you tell us what you want and set a price cap. We watch the restocks, drops, and verified sellers around the clock, and when we land it, we charge you the item price plus a small service fee. If we can't get it, you pay nothing. No risk, no games.</p>
+    </div>
+
+    <div class="grid info-points">
+      ${values.map((v) => `
+        <div class="card info-point">
+          <div class="icon-box grad sm">${I[v.icon]({ s: 20 })}</div>
+          <h3>${v.title}</h3>
+          <p class="desc">${v.desc}</p>
+        </div>`).join('')}
+    </div>
+
+    <div class="grid stats" style="margin-top:3rem">
+      ${stats2.map((s) => `<div class="card"><p class="val">${s.value}</p><p class="lab">${s.label}</p></div>`).join('')}
+    </div>
+
+    <div class="cta" style="margin-top:3.5rem">
+      <div class="blob a"></div><div class="blob b"></div>
+      <h2>Let us catch the one you keep missing.</h2>
+      <p>Start a request in under two minutes — you won't be charged unless we land it.</p>
+      <div style="position:relative;margin-top:2rem;display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap">
+        <a href="#/request" class="btn btn-primary btn-lg">Start a request ${I.arrow({ s: 18 })}</a>
+        <a href="#/contact" class="btn btn-ghost btn-lg">Contact us</a>
+      </div>
+    </div>
+  </div>`
+}
+
+// ---------- contact (stateful form) ----------
+const contact = { submitted: false, form: { name: '', email: '', topic: 'General question', message: '' } }
+
+function pageContact() {
+  if (contact.submitted) {
+    return `
+    <div class="container-x section" style="padding-top:6rem">
+      <div class="card narrow-sm text-center">
+        <div class="success-ic">${I.check({ s: 34 })}</div>
+        <h1 style="margin-top:1.25rem;font-size:1.5rem;font-weight:800;color:#fff">Message sent</h1>
+        <p style="margin-top:.75rem;font-size:.875rem;color:#94a3b8">Thanks, ${esc(contact.form.name || 'there')}! Our team will reply to <strong style="color:#e2e8f0">${esc(contact.form.email)}</strong> within one business day.</p>
+        <div class="col sm-row mt-7">
+          <button class="btn btn-ghost" id="contactReset">Send another</button>
+          <a href="#/" class="btn btn-primary">Back to home</a>
+        </div>
+      </div>
+    </div>`
+  }
+
+  const f = contact.form
+  const topics = ['General question', 'Help with a hunt', 'Billing', 'Partnerships', 'Press']
+  const methods = [
+    { icon: 'mail', title: 'Email us', value: 'support@hunt.example', note: 'Replies within 1 business day' },
+    { icon: 'chat', title: 'Live chat', value: 'In-app (coming soon)', note: 'Mon–Fri, 9am–6pm' },
+    { icon: 'globe', title: 'Help center', value: 'Browse the FAQ', note: 'Answers to common questions', link: '#/faq' },
+  ]
+
+  return `
+  <div class="container-x section" style="padding-top:4rem">
+    ${sectionHead({ eyebrow: 'Contact', title: 'Get in touch', subtitle: "Questions about a hunt, billing, or partnerships? Send us a message and we'll get back to you fast." })}
+
+    <div class="contact-grid">
+      <div class="card contact-form-card">
+        <form id="contactForm" class="space-y">
+          <div class="form-grid-2">
+            <div><label class="label">Name</label><input class="input" id="cName" placeholder="Alex Morgan" value="${esc(f.name)}" /></div>
+            <div><label class="label">Email *</label><input class="input" id="cEmail" type="email" placeholder="you@email.com" value="${esc(f.email)}" /></div>
+          </div>
+          <div>
+            <label class="label">Topic</label>
+            <div class="cat-wrap">
+              ${topics.map((t) => `<button type="button" class="cat-btn ${f.topic === t ? 'sel' : ''}" data-topic="${t}">${t}</button>`).join('')}
+            </div>
+          </div>
+          <div>
+            <label class="label">Message *</label>
+            <textarea class="input" id="cMessage" placeholder="How can we help?">${esc(f.message)}</textarea>
+          </div>
+          <p class="auth-error hidden" id="cError"></p>
+          <button type="submit" class="btn btn-primary" style="width:100%">Send message ${I.arrow({ s: 18 })}</button>
+        </form>
+      </div>
+
+      <aside class="contact-side">
+        ${methods.map((m) => `
+          ${m.link ? `<a href="${m.link}" class="card contact-method">` : `<div class="card contact-method">`}
+            <div class="icon-box grad sm">${I[m.icon]({ s: 18 })}</div>
+            <div>
+              <p class="cm-title">${m.title}</p>
+              <p class="cm-value">${m.value}</p>
+              <p class="cm-note">${m.note}</p>
+            </div>
+          ${m.link ? `</a>` : `</div>`}`).join('')}
+      </aside>
+    </div>
+
+    <p class="demo-note">${I.shield({ s: 13 })} Demo contact form — messages aren't actually sent yet.</p>
+  </div>`
+}
+
+// ---------- legal pages (terms / privacy) ----------
+function legalPage({ title, updated, intro, sections }) {
+  return `
+  <div class="container-x section" style="padding-top:4rem">
+    <div class="legal">
+      <h1 class="legal-title">${title}</h1>
+      <p class="legal-updated">Last updated: ${updated}</p>
+      <p class="legal-intro">${intro}</p>
+      ${sections.map((s, i) => `
+        <section class="legal-section">
+          <h2>${i + 1}. ${s.h}</h2>
+          <p>${s.p}</p>
+        </section>`).join('')}
+      <div class="legal-disclaimer">
+        ${I.shield({ s: 15 })}
+        <span>This is sample/template content for a prototype, not legal advice. Before launching a real service, have a qualified attorney review and finalize these terms.</span>
+      </div>
+    </div>
+  </div>`
+}
+
+function pageTerms() {
+  return legalPage({
+    title: 'Terms of Service',
+    updated: 'October 2026',
+    intro: 'These terms govern your use of Hunt (the "Service"). By creating a request or using the site, you agree to them. Please read them carefully.',
+    sections: [
+      { h: 'The service we provide', p: 'Hunt is a personal shopping and sourcing service. You tell us what item you want and set a maximum price; we attempt to purchase it on your behalf at or near retail from authorized retailers and verified sellers.' },
+      { h: 'Charges and the service fee', p: 'You are only charged if we successfully secure your item. When we do, we charge your saved payment method for the item price plus a one-time service fee between $0 and $100, shown and approved before the hunt begins. If we do not secure the item, you are not charged.' },
+      { h: 'Your price cap', p: 'Every request includes a hard maximum price. We will not purchase an item above the cap you set. You are responsible for providing accurate item details (model, size, color, edition).' },
+      { h: 'Cancellations', p: 'You may cancel a pending hunt at any time before we secure the item, at no cost. Once an item is secured and charged, standard buyer-protection and refund terms apply.' },
+      { h: 'Buyer protection and refunds', p: 'If an item arrives not as described, damaged, or inauthentic, we will work to replace it or refund the item cost and the service fee, subject to our Buyer Protection policy.' },
+      { h: 'Acceptable use', p: 'You agree not to use the Service for any unlawful purpose, to request prohibited or illegal items, or to attempt to defraud Hunt, retailers, or sellers.' },
+      { h: 'Limitation of liability', p: 'The Service is provided on an "as is" basis. To the maximum extent permitted by law, Hunt is not liable for indirect or consequential damages arising from use of the Service.' },
+      { h: 'Changes to these terms', p: 'We may update these terms from time to time. Material changes will be communicated, and continued use of the Service after changes take effect constitutes acceptance.' },
+    ],
+  })
+}
+
+function pagePrivacy() {
+  return legalPage({
+    title: 'Privacy Policy',
+    updated: 'October 2026',
+    intro: 'This policy explains what information Hunt collects, how we use it, and the choices you have. We aim to collect only what we need to run the Service.',
+    sections: [
+      { h: 'Information we collect', p: 'Account details (name, email), the items and price caps you request, and communications with our team. Payment details are collected and processed by our payment provider — we do not store raw card numbers.' },
+      { h: 'How we use your information', p: 'To source and purchase items on your behalf, to charge you only upon a successful find, to provide support, and to improve the Service. We do not sell your personal information.' },
+      { h: 'Payment data', p: 'Card information is encrypted and tokenized by a PCI-compliant payment processor. Hunt retains only a secure token reference needed to charge you when a hunt succeeds.' },
+      { h: 'Data sharing', p: 'We share only what is necessary with payment processors, shipping carriers, and verified sellers to complete your orders. We may disclose information if required by law.' },
+      { h: 'Data retention', p: 'We keep your information for as long as your account is active or as needed to provide the Service and meet legal obligations. You may request deletion of your account data.' },
+      { h: 'Your rights', p: 'Depending on where you live, you may have rights to access, correct, export, or delete your personal data. Contact us to exercise these rights.' },
+      { h: 'Cookies', p: 'We use essential cookies to keep you signed in and to understand how the site is used. You can control cookies through your browser settings.' },
+      { h: 'Contact', p: 'For privacy questions or requests, reach us through the Contact page.' },
+    ],
+  })
+}
+
 // ---------- trust / info pages ----------
 // Shared renderer for a focused single-topic page.
 function infoPage({ eyebrow, title, subtitle, points, how, faqs: pageFaqs, ctaTitle }) {
@@ -997,6 +1187,10 @@ const routes = {
   '/guarantee': pageGuarantee,
   '/secure-payments': pageSecurePayments,
   '/buyer-protection': pageBuyerProtection,
+  '/about': pageAbout,
+  '/contact': pageContact,
+  '/terms': pageTerms,
+  '/privacy': pagePrivacy,
 }
 
 function render() {
@@ -1026,6 +1220,8 @@ function bindEvents(route) {
 
   if (route === '/login') bindAuth()
 
+  if (route === '/contact') bindContact()
+
   if (route === '/faq') {
     document.querySelectorAll('[data-faq]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -1050,6 +1246,43 @@ function bindEvents(route) {
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit() })
     }
   }
+}
+
+function bindContact() {
+  if (contact.submitted) {
+    const reset = document.getElementById('contactReset')
+    if (reset) reset.addEventListener('click', () => {
+      contact.submitted = false
+      contact.form = { name: '', email: '', topic: 'General question', message: '' }
+      render()
+    })
+    return
+  }
+
+  // topic chips
+  document.querySelectorAll('[data-topic]').forEach((b) =>
+    b.addEventListener('click', () => { contact.form.topic = b.getAttribute('data-topic'); render() }))
+
+  // keep field values in state as the user types
+  const bindField = (id, key) => {
+    const el = document.getElementById(id)
+    if (el) el.addEventListener('input', (e) => { contact.form[key] = e.target.value })
+  }
+  bindField('cName', 'name')
+  bindField('cEmail', 'email')
+  bindField('cMessage', 'message')
+
+  const form = document.getElementById('contactForm')
+  if (form) form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const err = document.getElementById('cError')
+    const show = (msg) => { if (err) { err.textContent = msg; err.classList.remove('hidden') } }
+    if (!contact.form.email.includes('@')) return show('Please enter a valid email address.')
+    if (contact.form.message.trim().length < 5) return show('Please enter a short message.')
+    contact.submitted = true
+    render()
+    window.scrollTo({ top: 0 })
+  })
 }
 
 function bindAuth() {

@@ -48,6 +48,77 @@ const testimonials = [
 
 const categories = ['Sneakers', 'Consoles', 'GPUs', 'Collectibles', 'Event tickets', 'Electronics', 'Trading cards', 'Toys']
 
+// ---------- sample account data (mock) ----------
+// Each hunt moves through: requested -> hunting -> secured -> charged -> shipped (or: not_found)
+const hunts = [
+  {
+    id: 'HNT-20418', emoji: '🎮', item: 'Next-Gen Console — Disc Edition', category: 'Consoles',
+    priceCap: 499, itemPrice: 499, fee: 35, status: 'shipped', difficulty: 'high',
+    opened: 'Sep 28, 2026', updated: 'Oct 3, 2026', eta: 'Delivered Oct 5', tracking: '1Z-882-HNT-4410',
+    stage: 5,
+    events: [
+      { label: 'Request received', note: 'We locked onto the exact model and set your $499 cap.', date: 'Sep 28', done: true },
+      { label: 'Hunting', note: 'Monitoring 6 retailers and 3 verified sellers 24/7.', date: 'Sep 28', done: true },
+      { label: 'Item secured', note: 'Grabbed one unit at retail during a surprise restock.', date: 'Oct 2', done: true },
+      { label: 'Payment charged', note: 'Charged $534 (item $499 + $35 fee) to Visa •• 4242.', date: 'Oct 2', done: true },
+      { label: 'Shipped', note: 'Out for delivery with tracking 1Z-882-HNT-4410.', date: 'Oct 3', done: true },
+    ],
+  },
+  {
+    id: 'HNT-20533', emoji: '👟', item: 'Limited Runner "Volt" — US 10.5', category: 'Sneakers',
+    priceCap: 220, itemPrice: null, fee: 60, status: 'hunting', difficulty: 'high',
+    opened: 'Oct 1, 2026', updated: 'Oct 5, 2026', eta: 'Next drop window ~Oct 8', tracking: null,
+    stage: 2,
+    events: [
+      { label: 'Request received', note: 'Size US 10.5 locked. Hard cap set at $220.', date: 'Oct 1', done: true },
+      { label: 'Hunting', note: 'Watching the next scheduled drop. High scalper activity detected.', date: 'Oct 1', done: true, active: true },
+      { label: 'Item secured', note: 'Waiting for the next release window.', date: null, done: false },
+      { label: 'Payment charged', note: 'You are only charged once we secure it.', date: null, done: false },
+      { label: 'Shipped', note: '', date: null, done: false },
+    ],
+  },
+  {
+    id: 'HNT-20571', emoji: '🖥️', item: 'RTX Founders GPU', category: 'GPUs',
+    priceCap: 1099, itemPrice: 1099, fee: 45, status: 'secured', difficulty: 'high',
+    opened: 'Oct 2, 2026', updated: 'Oct 5, 2026', eta: 'Charging + shipping shortly', tracking: null,
+    stage: 3,
+    events: [
+      { label: 'Request received', note: 'Founders edition only. Cap $1,099.', date: 'Oct 2', done: true },
+      { label: 'Hunting', note: 'Caught a restock alert within 40 seconds.', date: 'Oct 2', done: true },
+      { label: 'Item secured', note: 'Reserved one unit at MSRP. Confirming your charge next.', date: 'Oct 5', done: true, active: true },
+      { label: 'Payment charged', note: 'About to charge $1,144 (item $1,099 + $45 fee).', date: null, done: false },
+      { label: 'Shipped', note: '', date: null, done: false },
+    ],
+  },
+  {
+    id: 'HNT-20244', emoji: '🎟️', item: 'Arena Tour — 2x Floor Seats', category: 'Event tickets',
+    priceCap: 400, itemPrice: null, fee: 0, status: 'not_found', difficulty: 'medium',
+    opened: 'Sep 20, 2026', updated: 'Sep 27, 2026', eta: 'Closed — no charge', tracking: null,
+    stage: 1,
+    events: [
+      { label: 'Request received', note: 'Two floor seats, cap $400 total.', date: 'Sep 20', done: true },
+      { label: 'Hunting', note: 'Event sold out; no verified seats appeared under your cap.', date: 'Sep 20', done: true },
+      { label: 'Closed — not found', note: 'We could not secure it under your cap, so you were charged $0.', date: 'Sep 27', done: true, failed: true },
+    ],
+  },
+]
+
+const account = {
+  name: 'Alex Morgan',
+  email: 'alex.morgan@email.com',
+  memberSince: 'Member since 2025',
+  card: { brand: 'Visa', last4: '4242', exp: '08/28' },
+}
+
+const statusMeta = {
+  requested: { label: 'Requested', cls: 'st-blue' },
+  hunting: { label: 'Hunting', cls: 'st-amber' },
+  secured: { label: 'Secured', cls: 'st-violet' },
+  charged: { label: 'Charged', cls: 'st-green' },
+  shipped: { label: 'Shipped', cls: 'st-green' },
+  not_found: { label: 'Not found · $0', cls: 'st-gray' },
+}
+
 // ---------- icons ----------
 const I = {
   _s: (p) => `<svg width="${p.s||24}" height="${p.s||24}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="${p.c||''}">`,
@@ -65,14 +136,15 @@ const I = {
   plus: (p={}) => `${I._s(p)}<path d="M12 5v14M5 12h14"/></svg>`,
   minus: (p={}) => `${I._s(p)}<path d="M5 12h14"/></svg>`,
   star: (p={}) => `<svg width="${p.s||16}" height="${p.s||16}" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.5 5.9 6.4.5-4.9 4.2 1.5 6.3L12 16.8 6 20.9l1.5-6.3L2.6 10.4l6.4-.5L12 3Z"/></svg>`,
+  grid: (p={}) => `${I._s(p)}<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></svg>`,
+  truck: (p={}) => `${I._s(p)}<path d="M3 6.5h11v9H3z"/><path d="M14 9.5h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.8"/><circle cx="17.5" cy="18" r="1.8"/></svg>`,
 }
 
 const esc = (s) => { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML }
 
-
 // ---------- shared chrome ----------
 function navbar() {
-  const links = [['#/how-it-works', 'How it works'], ['#/pricing', 'Pricing'], ['#/faq', 'FAQ']]
+  const links = [['#/how-it-works', 'How it works'], ['#/pricing', 'Pricing'], ['#/dashboard', 'Dashboard'], ['#/faq', 'FAQ']]
   const route = currentRoute()
   return `
   <header class="nav">
@@ -87,7 +159,7 @@ function navbar() {
         ${links.map(([h, l]) => `<a href="${h}" class="nav-link ${route === h.slice(1) ? 'active' : ''}">${l}</a>`).join('')}
       </div>
       <div class="nav-cta">
-        <a href="#/request" class="signin">Sign in</a>
+        <a href="#/dashboard" class="signin">Sign in</a>
         <a href="#/request" class="btn btn-primary">Start a request</a>
       </div>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
@@ -121,6 +193,8 @@ function footer() {
           <li><a href="#/how-it-works">How it works</a></li>
           <li><a href="#/pricing">Pricing</a></li>
           <li><a href="#/request">Start a request</a></li>
+          <li><a href="#/dashboard">My dashboard</a></li>
+          <li><a href="#/track">Track an order</a></li>
           <li><a href="#/faq">FAQ</a></li>
         </ul>
       </div>
@@ -516,13 +590,207 @@ function pageRequest() {
   </div>`
 }
 
+// ---------- dashboard + tracking ----------
+function statusBadge(status) {
+  const m = statusMeta[status] || { label: status, cls: 'st-gray' }
+  return `<span class="status ${m.cls}">${m.label}</span>`
+}
+
+function money(n) {
+  return '$' + Number(n).toLocaleString()
+}
+
+function huntRow(h) {
+  const paid = h.itemPrice != null
+  const total = paid ? h.itemPrice + h.fee : null
+  return `
+    <a href="#/track?id=${h.id}" class="hunt-row">
+      <div class="hr-emoji">${h.emoji}</div>
+      <div class="hr-main">
+        <p class="hr-item">${esc(h.item)}</p>
+        <p class="hr-meta">${h.id} · ${esc(h.category)} · opened ${h.opened}</p>
+      </div>
+      <div class="hr-side">
+        ${statusBadge(h.status)}
+        <p class="hr-amt">${total != null ? money(total) + ' charged' : 'Cap ' + money(h.priceCap)}</p>
+      </div>
+      <span class="hr-chevron">${I.arrow({ s: 18 })}</span>
+    </a>`
+}
+
+function pageDashboard() {
+  const active = hunts.filter((h) => ['requested', 'hunting', 'secured'].includes(h.status))
+  const past = hunts.filter((h) => ['charged', 'shipped', 'not_found'].includes(h.status))
+  const secured = hunts.filter((h) => h.itemPrice != null)
+  const totalSpent = secured.reduce((s, h) => s + h.itemPrice + h.fee, 0)
+  const totalFees = secured.reduce((s, h) => s + h.fee, 0)
+
+  const summary = [
+    { icon: 'search', value: active.length, label: 'Active hunts' },
+    { icon: 'package', value: secured.length, label: 'Items secured' },
+    { icon: 'card', value: money(totalSpent), label: 'Total spent' },
+    { icon: 'tag', value: money(totalFees), label: 'Service fees paid' },
+  ]
+
+  return `
+  <div class="container-x section" style="padding-top:2.5rem">
+    <div class="dash-head">
+      <div class="flex" style="align-items:center;gap:1rem">
+        <span class="avatar lg">${account.name.charAt(0)}</span>
+        <div>
+          <h1 class="dash-title">Welcome back, ${esc(account.name.split(' ')[0])}</h1>
+          <p class="dash-sub">${esc(account.email)} · ${account.memberSince}</p>
+        </div>
+      </div>
+      <a href="#/request" class="btn btn-primary">${I.plus({ s: 16 })} New hunt</a>
+    </div>
+
+    <div class="grid dash-stats">
+      ${summary.map((s) => `
+        <div class="card dash-stat">
+          <div class="icon-box sm">${I[s.icon]({ s: 18 })}</div>
+          <div><p class="ds-val">${s.value}</p><p class="ds-lab">${s.label}</p></div>
+        </div>`).join('')}
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-col-main">
+        <h2 class="dash-section-title">Active hunts</h2>
+        ${active.length ? `<div class="hunt-list">${active.map(huntRow).join('')}</div>`
+          : `<div class="card empty">No active hunts right now. <a href="#/request" class="link">Start one →</a></div>`}
+
+        <h2 class="dash-section-title" style="margin-top:2.5rem">History</h2>
+        ${past.length ? `<div class="hunt-list">${past.map(huntRow).join('')}</div>`
+          : `<div class="card empty">Nothing here yet.</div>`}
+      </div>
+
+      <aside class="dash-col-side">
+        <div class="card">
+          <h3 class="side-title">Payment method</h3>
+          <div class="pay-card">
+            <div class="pay-top">
+              <span class="pay-brand">${account.card.brand}</span>
+              ${I.card({ s: 20 })}
+            </div>
+            <p class="pay-num">•••• •••• •••• ${account.card.last4}</p>
+            <p class="pay-exp">Expires ${account.card.exp}</p>
+          </div>
+          <p class="side-note">${I.lock({ s: 13 })} Charged only when a hunt succeeds.</p>
+          <button class="btn btn-ghost" style="width:100%;margin-top:.75rem" disabled>Update card</button>
+        </div>
+
+        <div class="card" style="margin-top:1.5rem">
+          <h3 class="side-title">The guarantee</h3>
+          <ul class="side-list">
+            <li>${I.check({ s: 15, c: 'text-brand' })} No find, no fee — ever.</li>
+            <li>${I.check({ s: 15, c: 'text-brand' })} You set a hard price cap.</li>
+            <li>${I.check({ s: 15, c: 'text-brand' })} Fee shown before any charge.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <p class="demo-note">${I.shield({ s: 13 })} This dashboard is a demo with sample data — no real account or payments yet.</p>
+  </div>`
+}
+
+function findHunt(id) {
+  return hunts.find((h) => h.id === id)
+}
+
+function pageTrack() {
+  // read ?id= from the hash
+  const q = (location.hash.split('?')[1] || '')
+  const params = new URLSearchParams(q)
+  const id = params.get('id')
+  const hunt = id ? findHunt(id) : null
+
+  // No id (or not found): show a lookup form + quick-pick list
+  if (!hunt) {
+    return `
+    <div class="container-x section" style="padding-top:4rem">
+      <div class="narrow">
+        <div class="req-head">
+          <span class="chip chip-brand">${I.truck({ s: 14 })} Track my hunt</span>
+          <h1>Where's my item?</h1>
+          <p>Enter your hunt ID to see live status, or pick a recent one below.</p>
+        </div>
+        <div class="card" style="margin-top:2rem">
+          <label class="label">Hunt ID</label>
+          <div class="input-icon">${I.search({ s: 18 })}<input class="input" id="trackInput" placeholder="e.g. HNT-20418" /></div>
+          <button class="btn btn-primary" id="trackGo" style="width:100%;margin-top:1rem">Track hunt ${I.arrow({ s: 18 })}</button>
+          ${id ? `<p class="track-error">No hunt found with ID "${esc(id)}". Check the ID and try again.</p>` : ''}
+        </div>
+        <h2 class="dash-section-title" style="margin-top:2.5rem">Your recent hunts</h2>
+        <div class="hunt-list">${hunts.map(huntRow).join('')}</div>
+      </div>
+    </div>`
+  }
+
+  const paid = hunt.itemPrice != null
+  const total = paid ? hunt.itemPrice + hunt.fee : null
+  const totalStages = hunt.status === 'not_found' ? 1 : 5
+  const pct = Math.round((hunt.stage / totalStages) * 100)
+
+  return `
+  <div class="container-x section" style="padding-top:2.5rem">
+    <div class="narrow">
+      <a href="#/dashboard" class="back-link">${I.arrow({ s: 16, c: 'flip' })} Back to dashboard</a>
+
+      <div class="card track-head" style="margin-top:1rem">
+        <div class="th-top">
+          <div class="flex" style="align-items:center;gap:1rem">
+            <div class="hr-emoji lg">${hunt.emoji}</div>
+            <div>
+              <h1 class="track-item">${esc(hunt.item)}</h1>
+              <p class="hr-meta">${hunt.id} · ${esc(hunt.category)}</p>
+            </div>
+          </div>
+          ${statusBadge(hunt.status)}
+        </div>
+
+        ${hunt.status !== 'not_found' ? `
+          <div class="progress-wrap">
+            <div class="progress-bar"><span style="width:${pct}%"></span></div>
+            <p class="progress-eta">${esc(hunt.eta)}</p>
+          </div>` : `
+          <div class="track-closed">${I.shield({ s: 16 })} This hunt closed without a find — <strong>you were charged $0</strong>.</div>`}
+
+        <div class="track-facts">
+          <div><span class="tf-k">Price cap</span><span class="tf-v">${money(hunt.priceCap)}</span></div>
+          <div><span class="tf-k">Service fee</span><span class="tf-v">${hunt.fee === 0 ? '$0' : money(hunt.fee)}</span></div>
+          <div><span class="tf-k">${paid ? 'Total charged' : 'Charged so far'}</span><span class="tf-v ${paid ? 'accent' : ''}">${total != null ? money(total) : '$0.00'}</span></div>
+          <div><span class="tf-k">Tracking #</span><span class="tf-v">${hunt.tracking ? esc(hunt.tracking) : '—'}</span></div>
+        </div>
+      </div>
+
+      <h2 class="dash-section-title" style="margin-top:2rem">Hunt timeline</h2>
+      <ol class="track-timeline">
+        ${hunt.events.map((e) => `
+          <li class="te ${e.done ? (e.failed ? 'failed' : 'done') : 'todo'} ${e.active ? 'active' : ''}">
+            <span class="te-dot">${e.failed ? '!' : e.done ? I.check({ s: 13 }) : '<span class="te-pip"></span>'}</span>
+            <div class="te-body">
+              <div class="te-head">
+                <span class="te-label">${esc(e.label)}</span>
+                ${e.date ? `<span class="te-date">${esc(e.date)}</span>` : ''}
+              </div>
+              ${e.note ? `<p class="te-note">${esc(e.note)}</p>` : ''}
+            </div>
+          </li>`).join('')}
+      </ol>
+
+      <p class="demo-note">${I.shield({ s: 13 })} Sample tracking data for demonstration — not a live order.</p>
+    </div>
+  </div>`
+}
+
 function pageNotFound() {
   return `<div class="container-x nf"><p class="big">404</p><h1>Page not found</h1><p>The page you're hunting for isn't here.</p><a href="#/" class="btn btn-primary mt-6">Back to home</a></div>`
 }
 
 // ---------- router ----------
 function currentRoute() {
-  const h = location.hash.replace(/^#/, '')
+  const h = location.hash.replace(/^#/, '').split('?')[0]
   return h || '/'
 }
 
@@ -532,6 +800,8 @@ const routes = {
   '/pricing': pagePricing,
   '/faq': pageFAQ,
   '/request': pageRequest,
+  '/dashboard': pageDashboard,
+  '/track': pageTrack,
 }
 
 function render() {
@@ -558,6 +828,19 @@ function bindEvents(route) {
   }
 
   if (route === '/request') bindRequest()
+
+  if (route === '/track') {
+    const input = document.getElementById('trackInput')
+    const go = document.getElementById('trackGo')
+    if (go && input) {
+      const submit = () => {
+        const val = input.value.trim().toUpperCase()
+        if (val) location.hash = '#/track?id=' + encodeURIComponent(val)
+      }
+      go.addEventListener('click', submit)
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit() })
+    }
+  }
 }
 
 function bindRequest() {

@@ -110,6 +110,9 @@ const account = {
   card: { brand: 'Visa', last4: '4242', exp: '08/28' },
 }
 
+// ---------- mock auth session (demo only — no real authentication) ----------
+const session = { loggedIn: false, mode: 'login', redirect: '#/dashboard' }
+
 const statusMeta = {
   requested: { label: 'Requested', cls: 'st-blue' },
   hunting: { label: 'Hunting', cls: 'st-amber' },
@@ -159,7 +162,10 @@ function navbar() {
         ${links.map(([h, l]) => `<a href="${h}" class="nav-link ${route === h.slice(1) ? 'active' : ''}">${l}</a>`).join('')}
       </div>
       <div class="nav-cta">
-        <a href="#/dashboard" class="signin">Sign in</a>
+        ${session.loggedIn
+          ? `<a href="#/dashboard" class="nav-user">${I.users({ s: 15 })} ${esc(account.name.split(' ')[0])}</a>
+             <button class="signin" id="navSignOut">Sign out</button>`
+          : `<a href="#/login" class="signin">Sign in</a>`}
         <a href="#/request" class="btn btn-primary">Start a request</a>
       </div>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
@@ -169,6 +175,9 @@ function navbar() {
     <div class="mobile-menu hidden" id="mobileMenu">
       <div class="container-x inner">
         ${links.map(([h, l]) => `<a href="${h}">${l}</a>`).join('')}
+        ${session.loggedIn
+          ? `<button class="mobile-signout" id="navSignOutMobile">Sign out</button>`
+          : `<a href="#/login">Sign in</a>`}
         <a href="#/request" class="btn btn-primary" style="margin-top:.5rem">Start a request</a>
       </div>
     </div>
@@ -618,7 +627,63 @@ function huntRow(h) {
     </a>`
 }
 
+// ---------- auth (mock) ----------
+function pageLogin() {
+  const isSignup = session.mode === 'signup'
+  return `
+  <div class="container-x section" style="padding-top:4rem">
+    <div class="auth-wrap">
+      <div class="auth-brand">
+        <span class="logo-mark" style="height:2.75rem;width:2.75rem">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+        </span>
+        <h1 class="auth-title">${isSignup ? 'Create your account' : 'Welcome back'}</h1>
+        <p class="auth-sub">${isSignup ? 'Start hunting items you can\'t buy anywhere else.' : 'Sign in to track your hunts and manage your account.'}</p>
+      </div>
+
+      <div class="card auth-card">
+        <form id="authForm" class="space-y">
+          ${isSignup ? `
+          <div>
+            <label class="label">Full name</label>
+            <input class="input" id="authName" placeholder="Alex Morgan" value="Alex Morgan" />
+          </div>` : ''}
+          <div>
+            <label class="label">Email</label>
+            <input class="input" id="authEmail" type="email" placeholder="you@email.com" value="alex.morgan@email.com" />
+          </div>
+          <div>
+            <label class="label">Password</label>
+            <input class="input" id="authPass" type="password" placeholder="••••••••" value="demopass" />
+            ${!isSignup ? '<p style="margin-top:.375rem;font-size:.75rem"><a href="#/login" class="link">Forgot password?</a></p>' : ''}
+          </div>
+          <p class="auth-error hidden" id="authError"></p>
+          <button type="submit" class="btn btn-primary" style="width:100%">
+            ${isSignup ? 'Create account' : 'Sign in'} ${I.arrow({ s: 18 })}
+          </button>
+        </form>
+
+        <div class="auth-divider"><span>or</span></div>
+        <button class="btn btn-ghost" style="width:100%" id="authDemo">${I.bolt({ s: 16 })} Continue with demo account</button>
+
+        <p class="auth-switch">
+          ${isSignup
+            ? `Already have an account? <a href="#" data-authmode="login" class="link">Sign in</a>`
+            : `New to Hunt? <a href="#" data-authmode="signup" class="link">Create an account</a>`}
+        </p>
+      </div>
+
+      <p class="demo-note">${I.shield({ s: 13 })} Demo sign-in only — any email/password works and no real account is created.</p>
+    </div>
+  </div>`
+}
+
 function pageDashboard() {
+  // mock auth guard: must be "logged in" to view the dashboard
+  if (!session.loggedIn) {
+    session.redirect = '#/dashboard'
+    return pageLogin()
+  }
   const active = hunts.filter((h) => ['requested', 'hunting', 'secured'].includes(h.status))
   const past = hunts.filter((h) => ['charged', 'shipped', 'not_found'].includes(h.status))
   const secured = hunts.filter((h) => h.itemPrice != null)
@@ -800,6 +865,7 @@ const routes = {
   '/pricing': pagePricing,
   '/faq': pageFAQ,
   '/request': pageRequest,
+  '/login': pageLogin,
   '/dashboard': pageDashboard,
   '/track': pageTrack,
 }
@@ -811,11 +877,25 @@ function render() {
   bindEvents(route)
 }
 
+function signOut() {
+  session.loggedIn = false
+  location.hash = '#/'
+  render()
+}
+
 function bindEvents(route) {
   // mobile menu
   const toggle = document.getElementById('navToggle')
   const menu = document.getElementById('mobileMenu')
   if (toggle && menu) toggle.addEventListener('click', () => menu.classList.toggle('hidden'))
+
+  // sign out (nav, both desktop + mobile)
+  const so = document.getElementById('navSignOut')
+  if (so) so.addEventListener('click', signOut)
+  const soM = document.getElementById('navSignOutMobile')
+  if (soM) soM.addEventListener('click', signOut)
+
+  if (route === '/login') bindAuth()
 
   if (route === '/faq') {
     document.querySelectorAll('[data-faq]').forEach((btn) => {
@@ -841,6 +921,45 @@ function bindEvents(route) {
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit() })
     }
   }
+}
+
+function bindAuth() {
+  const isSignup = session.mode === 'signup'
+
+  // switch between login / signup
+  document.querySelectorAll('[data-authmode]').forEach((a) =>
+    a.addEventListener('click', (e) => {
+      e.preventDefault()
+      session.mode = a.getAttribute('data-authmode')
+      render()
+    }))
+
+  const complete = () => {
+    session.loggedIn = true
+    location.hash = session.redirect || '#/dashboard'
+    render()
+    window.scrollTo({ top: 0 })
+  }
+
+  // demo shortcut
+  const demo = document.getElementById('authDemo')
+  if (demo) demo.addEventListener('click', complete)
+
+  // form submit (any input is accepted — this is a mock)
+  const form = document.getElementById('authForm')
+  if (form) form.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const email = (document.getElementById('authEmail') || {}).value || ''
+    const pass = (document.getElementById('authPass') || {}).value || ''
+    const name = (document.getElementById('authName') || {}).value || ''
+    const err = document.getElementById('authError')
+    const show = (msg) => { if (err) { err.textContent = msg; err.classList.remove('hidden') } }
+
+    if (!email.includes('@')) return show('Please enter a valid email address.')
+    if (pass.length < 4) return show('Password must be at least 4 characters.')
+    if (isSignup && name.trim().length < 2) return show('Please enter your name.')
+    complete()
+  })
 }
 
 function bindRequest() {

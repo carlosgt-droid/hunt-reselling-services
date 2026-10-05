@@ -533,3 +533,20 @@ textarea.input { min-height: 90px; resize: vertical; }
 .te.todo .te-note { color: #64748b; }
 
 .track-error { margin-top: 1rem; font-size: .8125rem; color: #fca5a5; }
+
+/* ---------- auth (login / signup) ---------- */
+.nav-user { display: inline-flex; align-items: center; gap: .375rem; font-size: .875rem; font-weight: 600; color: #e2e8f0; }
+.nav-user:hover { color: #fff; }
+.nav-cta .signin { background: transparent; border: 0; }
+.mobile-signout { text-align: left; background: transparent; border: 0; border-radius: .5rem; padding: .625rem .75rem; font-size: .875rem; font-weight: 500; color: #cbd5e1; }
+.mobile-signout:hover { background: rgba(255,255,255,.05); color: #fff; }
+
+.auth-wrap { max-width: 26rem; margin: 0 auto; }
+.auth-brand { text-align: center; display: flex; flex-direction: column; align-items: center; gap: .5rem; margin-bottom: 1.5rem; }
+.auth-title { margin-top: .5rem; font-size: 1.5rem; font-weight: 800; color: #fff; letter-spacing: -.02em; }
+.auth-sub { font-size: .875rem; color: #94a3b8; max-width: 20rem; }
+.auth-card { padding: 1.75rem; }
+.auth-divider { display: flex; align-items: center; gap: .75rem; margin: 1.25rem 0; color: #64748b; font-size: .75rem; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.auth-switch { margin-top: 1.25rem; text-align: center; font-size: .875rem; color: #94a3b8; }
+.auth-error { border-radius: .625rem; border: 1px solid rgba(248,113,113,.3); background: rgba(248,113,113,.1); padding: .625rem .875rem; font-size: .8125rem; color: #fca5a5; }

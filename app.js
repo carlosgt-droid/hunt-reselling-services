@@ -67,7 +67,7 @@ const I = {
   star: (p={}) => `<svg width="${p.s||16}" height="${p.s||16}" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.5 5.9 6.4.5-4.9 4.2 1.5 6.3L12 16.8 6 20.9l1.5-6.3L2.6 10.4l6.4-.5L12 3Z"/></svg>`,
 }
 
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '<', '>': '>', '"': '"', "'": ''' }[c]))
+const esc = (s) => { const d = document.createElement('div'); d.textContent = String(s); return d.innerHTML }
 
 // ---------- shared chrome ----------
 function navbar() {
